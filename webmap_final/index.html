@@ -7,6 +7,8 @@
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/map-tools.css">
+        <script src="../assets/category-colors.js"></script>
         <link rel="stylesheet" href="css/qgis2web.css">
         <link rel="stylesheet" href="css/fontawesome-all.min.css">
         <link rel="stylesheet" href="css/leaflet.photon.css">
@@ -18,7 +20,7 @@
             margin: 0;
         }
         </style>
-        <title>Gefährdete Denkmale in Deutschland</title>
+        <title>Gefährdete Baudenkmale in Deutschland</title>
     </head>
     <body>
         <div id="map">
@@ -33,13 +35,13 @@
         <script src="js/labelgun.min.js"></script>
         <script src="js/labels.js"></script>
         <script src="js/leaflet.photon.js"></script>
-        <script src="data/bundeslaender_geobundeslaender_2.js"></script>
-        <script src="data/denkmale_punkte_geodenkmale_punkte_3.js"></script>
+        <script src="data/BBL_2.js"></script>
+        <script src="data/Gefhrdung_3.js"></script>
         <script>
         var map = L.map('map', {
-            zoomControl:false, maxZoom:28, minZoom:1
-        })
-        var hash = new L.Hash(map);
+            zoomControl:false, maxZoom:18, minZoom:5
+        }).fitBounds([[46.943250920174414,5.0944148828681035],[55.25807883921146,16.042098200548917]]);
+        // The iframe starts on Germany; do not restore an old hash.
         map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
         // remove popup's row if "visible-with-data"
@@ -63,15 +65,14 @@
             var imgTd = tempDiv.querySelector('td img');
             if (imgTd) {
                 var src = imgTd.getAttribute('src');
-                if (/\.(jpg|jpeg|png|gif|bmp|webp|avif)(?:[?#].*)?$/i.test(src) || /^data:image\//i.test(src)) {
+                if (/\.(jpg|jpeg|png|gif|bmp|webp|avif)$/i.test(src)) {
                     popup._contentNode.classList.add('media');
                     var img = popup._contentNode.querySelector('td img');
                     if (img) {
                         // If already loaded (cache), update immediately
                         if (img.complete && img.naturalHeight > 0) {
                             popup.update();
-                        } else if (!img.dataset.popupEventsBound) {
-                            img.dataset.popupEventsBound = '1';
+                        } else {
                             img.addEventListener('load', function() {
                                 popup.update();
                             });
@@ -115,42 +116,72 @@
                 popup._contentNode.classList.remove('media');
             }
         }
+        var abstract = new L.Control({'position':'bottomleft'});
+        abstract.onAdd = function (map) {
+            this._div = L.DomUtil.create('div',
+            'leaflet-control abstract');
+            this._div.id = 'abstract'
+                this._div.setAttribute("onmouseenter", "abstract.show()");
+                this._div.setAttribute("onmouseleave", "abstract.hide()");
+                this.hide();
+                return this._div;
+            };
+            abstract.hide = function () {
+                this._div.classList.remove("abstractUncollapsed");
+                this._div.classList.add("abstract");
+                this._div.innerHTML = 'i'
+            }
+            abstract.show = function () {
+                this._div.classList.remove("abstract");
+                this._div.classList.add("abstractUncollapsed");
+                this._div.innerHTML = '<br />Dieses WebGIS-Projekt visualisiert und analysiert 12 ausgewählte, akut gefährdete Baudenkmale in Deutschland. Auf Basis des „Schwarzbuchs der Denkmalpflege“ der Deutschen Stiftung Denkmalschutz (DSD) werden die spezifischen Gefährdungsursachen – darunter Substanzverfall, bauplanerischer Abriss und anhaltender Leerstand – räumlich verortet und thematisch differenziert dargestellt. <br /><br />Ziel der interaktiven Webkarte ist es, regionale Gefährdungsschwerpunkte im baulichen Erbe sichtbar zu machen und fundierte Fachinformationen über eine zugängliche Weboberfläche bereitzustellen.<br />';
+        };
+        abstract.addTo(map);
         var zoomControl = L.control.zoom({
             position: 'topleft'
         }).addTo(map);
         var bounds_group = new L.featureGroup([]);
         function setBounds() {
-            if (bounds_group.getLayers().length) {
-                map.fitBounds(bounds_group.getBounds());
-            }
         }
-
+        map.createPane('pane_CARTODarkMatter_0');
+        map.getPane('pane_CARTODarkMatter_0').style.zIndex = 400;
+        var layer_CARTODarkMatter_0 = L.tileLayer('https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png?key=cb1_4bfa_1_cc83b59caf38bb4857130338', {
+            pane: 'pane_CARTODarkMatter_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 5,
+            maxZoom: 18,
+            minNativeZoom: 0,
+            maxNativeZoom: 18
+        });
+        layer_CARTODarkMatter_0;
+        map.addLayer(layer_CARTODarkMatter_0);
         map.createPane('pane_CARTOPositron_1');
         map.getPane('pane_CARTOPositron_1').style.zIndex = 401;
         var layer_CARTOPositron_1 = L.tileLayer('https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=cb1_4bfa_1_cc83b59caf38bb4857130338', {
             pane: 'pane_CARTOPositron_1',
             opacity: 1.0,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>-Mitwirkende &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>',
-            minZoom: 1,
-            maxZoom: 28,
+            attribution: '',
+            minZoom: 5,
+            maxZoom: 18,
             minNativeZoom: 0,
             maxNativeZoom: 18
         });
         layer_CARTOPositron_1;
         map.addLayer(layer_CARTOPositron_1);
-        function pop_bundeslaender_geobundeslaender_2(feature, layer) {
+        function pop_BBL_2(feature, layer) {
             var popupContent = '<table>\
                 </table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
 			layer.on('popupopen', function(e) {
 				addClassToPopupIfMedia(content, e.popup);
 			});
-			layer.bindPopup(content, { maxHeight: 400 });
+			layer.bindPopup(content, { maxHeight: Math.min(650, window.innerHeight * 0.75), maxWidth: 340 });
         }
 
-        function style_bundeslaender_geobundeslaender_2_0() {
+        function style_BBL_2_0() {
             return {
-                pane: 'pane_bundeslaender_geobundeslaender_2',
+                pane: 'pane_BBL_2',
                 opacity: 1,
                 color: 'rgba(131,137,143,1.0)',
                 dashArray: '',
@@ -161,56 +192,36 @@
                 interactive: false,
             }
         }
-        map.createPane('pane_bundeslaender_geobundeslaender_2');
-        map.getPane('pane_bundeslaender_geobundeslaender_2').style.zIndex = 402;
-        map.getPane('pane_bundeslaender_geobundeslaender_2').style['mix-blend-mode'] = 'normal';
-        var layer_bundeslaender_geobundeslaender_2 = new L.geoJson(json_bundeslaender_geobundeslaender_2, {
+        map.createPane('pane_BBL_2');
+        map.getPane('pane_BBL_2').style.zIndex = 402;
+        map.getPane('pane_BBL_2').style['mix-blend-mode'] = 'normal';
+        var layer_BBL_2 = new L.geoJson(json_BBL_2, {
             attribution: '',
             interactive: false,
-            dataVar: 'json_bundeslaender_geobundeslaender_2',
-            layerName: 'layer_bundeslaender_geobundeslaender_2',
-            pane: 'pane_bundeslaender_geobundeslaender_2',
-            onEachFeature: pop_bundeslaender_geobundeslaender_2,
-            style: style_bundeslaender_geobundeslaender_2_0,
+            dataVar: 'json_BBL_2',
+            layerName: 'layer_BBL_2',
+            pane: 'pane_BBL_2',
+            onEachFeature: pop_BBL_2,
+            style: style_BBL_2_0,
         });
-        bounds_group.addLayer(layer_bundeslaender_geobundeslaender_2);
-        map.addLayer(layer_bundeslaender_geobundeslaender_2);
+        bounds_group.addLayer(layer_BBL_2);
+        map.addLayer(layer_BBL_2);
 
         function popupImageHtml(value, properties) {
-            if (value == null || !String(value).trim()) return '';
-            var src = String(value).trim();
-            if (/<img\b/i.test(src)) {
-                var parsed = new DOMParser().parseFromString(src, 'text/html');
-                var image = parsed.querySelector('img');
-                src = image ? image.getAttribute('src') : '';
-            }
+            var name = String(properties.name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+            var local = /schwarz.*b(?:a|ae)r/.test(name) ? 'images/schwarzer_baer.jpg' : /villa.*buth/.test(name) ? 'images/villa_buth.jpg' : '';
+            var src = local || (value == null ? '' : String(value).trim());
+            if (/<img\b/i.test(src)) { var doc = new DOMParser().parseFromString(src, 'text/html'); var img = doc.querySelector('img'); src = img ? img.getAttribute('src') : ''; }
             if (!src || /^(javascript|vbscript):/i.test(src)) return '';
-            src = src.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-            var alt = String(properties.name || 'Denkmal').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-            return '<img class="denkmal-photo" src="' + src + '" alt="' + alt + '">';
+            return '<img class="denkmal-photo" src="' + src.replace(/&/g,'&amp;').replace(/"/g,'&quot;') + '" alt="' + String(properties.name || 'Denkmal').replace(/&/g,'&amp;').replace(/"/g,'&quot;') + '" onerror="this.hidden=true;this.insertAdjacentText(&quot;afterend&quot;,&quot;Bilddatei nicht vorhanden.&quot;);">';
         }
-        function popupPhotoCredit(properties) {
-            var id = Number(properties.id);
-            if (!properties.bild_url) return '';
-            var credit = String(properties.bildnachweis || '');
-            credit = credit.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-            if (id === 4) {
-                credit += ' <a href="https://commons.wikimedia.org/wiki/File:Zum_schwarzen_B%C3%A4ren_%28G%C3%B6ttingen%29_jm20489.jpg" target="_blank" rel="noopener noreferrer">Bildquelle</a> · ' +
-                    '<a href="https://creativecommons.org/licenses/by-sa/3.0/de/legalcode" target="_blank" rel="noopener noreferrer">Lizenz</a>';
-            } else if (id === 6) {
-                credit += ' <a href="https://www.denkmalschutz.de/pressemitteilung/villa-buth-aktualisierte-denkmalliste-bestaetigt-historische-bedeutung.html" target="_blank" rel="noopener noreferrer">Bildquelle und Nutzungsfreigabe</a>';
-            }
-            return '<div class="photo-credit">' + credit + '</div>';
-        }
-
-        function pop_denkmale_punkte_geodenkmale_punkte_3(feature, layer) {
+        function pop_Gefhrdung_3(feature, layer) {
             var popupContent = '<table>\
                     <tr>\
                         <td colspan="2">' + (feature.properties['name'] !== null ? autolinker.link(String(feature.properties['name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">ort</th>\
-                        <td class="visible-with-data" id="ort">' + (feature.properties['ort'] !== null ? autolinker.link(String(feature.properties['ort']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td colspan="2">' + (feature.properties['ort'] !== null ? autolinker.link(String(feature.properties['ort']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <td colspan="2">' + (feature.properties['beschreibung'] !== null ? autolinker.link(String(feature.properties['beschreibung']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
@@ -219,10 +230,10 @@
                         <td colspan="2">' + (feature.properties['quelle_url'] !== null ? autolinker.link(String(feature.properties['quelle_url']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <td colspan="2" class="visible-with-data" id="bild_url">' + popupImageHtml(feature.properties['bild_url'], feature.properties) + '</td>\
+                        <td colspan="2">' + (feature.properties['bild_url'] !== null ? popupImageHtml(feature.properties['bild_url'], feature.properties) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <td colspan="2">' + popupPhotoCredit(feature.properties) + '</td>\
+                        <td colspan="2">' + (feature.properties['bildnachweis'] !== null ? autolinker.link(String(feature.properties['bildnachweis']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
@@ -232,11 +243,11 @@
 			layer.bindPopup(content, { maxHeight: Math.min(650, window.innerHeight * 0.75), maxWidth: 340 });
         }
 
-        function style_denkmale_punkte_geodenkmale_punkte_3_0(feature) {
+        function style_Gefhrdung_3_0(feature) {
             switch(String(feature.properties['kategorie'])) {
                 case 'Abriss':
                     return {
-                pane: 'pane_denkmale_punkte_geodenkmale_punkte_3',
+                pane: 'pane_Gefhrdung_3',
                 radius: 8.0,
                 opacity: 1,
                 color: 'rgba(255,255,255,1.0)',
@@ -252,7 +263,7 @@
                     break;
                 case 'Hochwasser':
                     return {
-                pane: 'pane_denkmale_punkte_geodenkmale_punkte_3',
+                pane: 'pane_Gefhrdung_3',
                 radius: 8.0,
                 opacity: 1,
                 color: 'rgba(255,255,255,1.0)',
@@ -268,7 +279,7 @@
                     break;
                 case 'Infrastruktur':
                     return {
-                pane: 'pane_denkmale_punkte_geodenkmale_punkte_3',
+                pane: 'pane_Gefhrdung_3',
                 radius: 8.0,
                 opacity: 1,
                 color: 'rgba(255,255,255,1.0)',
@@ -284,7 +295,7 @@
                     break;
                 case 'Leerstand':
                     return {
-                pane: 'pane_denkmale_punkte_geodenkmale_punkte_3',
+                pane: 'pane_Gefhrdung_3',
                 radius: 8.0,
                 opacity: 1,
                 color: 'rgba(255,255,255,1.0)',
@@ -300,7 +311,7 @@
                     break;
                 case 'Verfall':
                     return {
-                pane: 'pane_denkmale_punkte_geodenkmale_punkte_3',
+                pane: 'pane_Gefhrdung_3',
                 radius: 8.0,
                 opacity: 1,
                 color: 'rgba(255,255,255,1.0)',
@@ -316,28 +327,29 @@
                     break;
             }
         }
-        map.createPane('pane_denkmale_punkte_geodenkmale_punkte_3');
-        map.getPane('pane_denkmale_punkte_geodenkmale_punkte_3').style.zIndex = 403;
-        map.getPane('pane_denkmale_punkte_geodenkmale_punkte_3').style['mix-blend-mode'] = 'normal';
-        var layer_denkmale_punkte_geodenkmale_punkte_3 = new L.geoJson(json_denkmale_punkte_geodenkmale_punkte_3, {
+        map.createPane('pane_Gefhrdung_3');
+        map.getPane('pane_Gefhrdung_3').style.zIndex = 403;
+        map.getPane('pane_Gefhrdung_3').style['mix-blend-mode'] = 'normal';
+        var layer_Gefhrdung_3 = new L.geoJson(json_Gefhrdung_3, {
             attribution: '',
             interactive: true,
-            dataVar: 'json_denkmale_punkte_geodenkmale_punkte_3',
-            layerName: 'layer_denkmale_punkte_geodenkmale_punkte_3',
-            pane: 'pane_denkmale_punkte_geodenkmale_punkte_3',
-            onEachFeature: pop_denkmale_punkte_geodenkmale_punkte_3,
+            dataVar: 'json_Gefhrdung_3',
+            layerName: 'layer_Gefhrdung_3',
+            pane: 'pane_Gefhrdung_3',
+            onEachFeature: pop_Gefhrdung_3,
             pointToLayer: function (feature, latlng) {
                 var context = {
                     feature: feature,
                     variables: {}
                 };
-                return L.circleMarker(latlng, style_denkmale_punkte_geodenkmale_punkte_3_0(feature));
+                return L.circleMarker(latlng, style_Gefhrdung_3_0(feature));
             },
         });
-        bounds_group.addLayer(layer_denkmale_punkte_geodenkmale_punkte_3);
-        map.addLayer(layer_denkmale_punkte_geodenkmale_punkte_3);
+        bounds_group.addLayer(layer_Gefhrdung_3);
+        map.addLayer(layer_Gefhrdung_3);
         setBounds();
         </script>        
+        <script src="js/map-tools.js"></script>
         <script src="js/card-map-bridge.js"></script>
     </body>
 </html>

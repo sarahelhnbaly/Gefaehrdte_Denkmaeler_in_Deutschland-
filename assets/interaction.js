@@ -43,7 +43,7 @@
     send('HELLO');
     if (attempts >= 45) {
       clearInterval(handshakeTimer);
-      statusText('Karte nicht verbunden. Bitte den gesamten entpackten Ordner öffnen, nicht nur index.html.', true);
+      statusText('Karte nicht verbunden. Bitte prüfen, ob webmap_final/data und die JavaScript-Dateien vollständig neben dieser Seite liegen.', true);
     }
   }
 
@@ -71,6 +71,16 @@
     var message = event.data;
     if (!message || typeof message !== 'object' || message.channel !== CHANNEL) return;
     if (message.type === 'READY' && Array.isArray(message.ids)) {
+      if (Array.isArray(message.sites)) message.sites.forEach(function(site) {
+        var card = cardById.get(Number(site.id)); if (!card) return;
+        if (site.name) card.querySelector('h3').textContent = site.name;
+        var location = [site.ort, site.bundesland].filter(Boolean).join(', '); if (location) card.querySelector('.location').textContent = location;
+        if (site.kategorie && window.DENKMAL_COLORS[site.kategorie]) {
+          Object.keys(window.DENKMAL_COLORS).forEach(function(k){card.classList.remove(k);card.querySelector('.badge').classList.remove(k);});
+          card.classList.add(site.kategorie); var badge=card.querySelector('.badge');badge.classList.add(site.kategorie);badge.textContent=site.kategorie;
+        }
+        if (site.gefaehrdung) {var danger=card.querySelector('.danger-text');danger.replaceChildren();var label=document.createElement('strong');label.textContent='Gefährdung: ';danger.appendChild(label);danger.appendChild(document.createTextNode(site.gefaehrdung));}
+      });
       ready = true;
       clearInterval(handshakeTimer);
       knownIds = new Set(message.ids.filter(Number.isInteger));
@@ -90,6 +100,9 @@
       if (!cardById.has(id)) return;
       highlight(id, true);
       statusText(cardById.get(id).querySelector('h3').textContent + ' · ausgewählt');
+    } else if (message.type === 'SELECTION_CLEARED') {
+      highlight(null, false);
+      statusText(message.reason === 'search' ? 'Adresse gefunden · Suchergebnis auf der Karte' : 'Deutschlandübersicht · 12 Fälle');
     } else if (message.type === 'ERROR') {
       statusText(typeof message.message === 'string' ? message.message : 'Die Kartenaktion konnte nicht ausgeführt werden.', true);
     }

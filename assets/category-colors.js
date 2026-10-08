@@ -1,0 +1,2 @@
+/* Palette extracted from the user's QGIS export, not newly chosen. */
+(function(){'use strict';var colors=Object.freeze({"Abriss": "#c43d3d", "Hochwasser": "#2675b8", "Infrastruktur": "#168478", "Leerstand": "#7851a9", "Verfall": "#b96a14"});window.DENKMAL_COLORS=colors;Object.keys(colors).forEach(function(k){document.documentElement.style.setProperty('--threat-'+k.toLowerCase(),colors[k]);});})();

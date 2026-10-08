@@ -7,6 +7,7 @@
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
 
+  <script src="assets/category-colors.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -117,11 +118,11 @@
       border-left: 5px solid #cbd5e1;
       box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
-    .card-item.Verfall { border-left-color: #ea580c; }
-    .card-item.Abriss { border-left-color: #dc2626; }
-    .card-item.Hochwasser { border-left-color: #2563eb; }
-    .card-item.Infrastruktur { border-left-color: #0d9488; }
-    .card-item.Leerstand { border-left-color: #7c3aed; }
+    .card-item.Verfall { border-left-color: var(--threat-verfall, #ea580c); }
+    .card-item.Abriss { border-left-color: var(--threat-abriss, #dc2626); }
+    .card-item.Hochwasser { border-left-color: var(--threat-hochwasser, #2563eb); }
+    .card-item.Infrastruktur { border-left-color: var(--threat-infrastruktur, #0d9488); }
+    .card-item.Leerstand { border-left-color: var(--threat-leerstand, #7c3aed); }
 
     .card-content {
       display: flex;
@@ -169,11 +170,11 @@
       font-weight: 700;
       color: #ffffff;
     }
-    .badge.Verfall { background-color: #ea580c; }
-    .badge.Abriss { background-color: #dc2626; }
-    .badge.Hochwasser { background-color: #2563eb; }
-    .badge.Infrastruktur { background-color: #0d9488; }
-    .badge.Leerstand { background-color: #7c3aed; }
+    .badge.Verfall { background-color: var(--threat-verfall, #ea580c); }
+    .badge.Abriss { background-color: var(--threat-abriss, #dc2626); }
+    .badge.Hochwasser { background-color: var(--threat-hochwasser, #2563eb); }
+    .badge.Infrastruktur { background-color: var(--threat-infrastruktur, #0d9488); }
+    .badge.Leerstand { background-color: var(--threat-leerstand, #7c3aed); }
 
     .danger-text {
       font-size: 11.5px;
@@ -253,6 +254,12 @@
       .site-footer { padding:6px 16px; flex-wrap:wrap; gap:5px; font-size:10px; }
       .footer-right { flex-wrap:wrap; gap:6px; }
     }
+
+    .card-visual { width:95px; min-width:95px; }
+    .card-thumbnail img { width:100%; height:100%; object-fit:contain; display:block; background:#f8fafc; }
+    .thumbnail-credit { display:block; margin-top:4px; font-size:9px; line-height:1.35; color:#64748b; }
+    .thumbnail-credit a { color:#64748b; text-decoration:none; }
+    .thumbnail-credit a:hover { text-decoration:underline; }
   </style>
 </head>
 <body>
@@ -300,9 +307,7 @@
         <!-- 2. Villa Buth -->
         <div class="card-item Abriss" data-site-id="6">
           <div class="card-content">
-            <div class="card-thumbnail">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.5"><path d="M3 21h18M4 18h16M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 3L2 9h20L12 3z"/></svg>
-            </div>
+            <div class="card-visual"><div class="card-thumbnail"><img src="webmap_final/images/villa_buth.jpg" alt="Villa Buth in Jülich" loading="lazy" width="95" height="85"></div><span class="thumbnail-credit"><a href="https://www.denkmalschutz.de/pressemitteilung/villa-buth-aktualisierte-denkmalliste-bestaetigt-historische-bedeutung.html" target="_blank" rel="noopener noreferrer">© D. Schenk / DSD</a></span></div>
             <div class="card-details">
               <h3>Villa Buth</h3>
               <span class="location">Jülich, Nordrhein-Westfalen</span>
@@ -332,9 +337,7 @@
         <!-- 4. Schwarzer Bär -->
         <div class="card-item Verfall" data-site-id="4">
           <div class="card-content">
-            <div class="card-thumbnail">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.5"><path d="M3 21h18M4 18h16M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 3L2 9h20L12 3z"/></svg>
-            </div>
+            <div class="card-visual"><div class="card-thumbnail"><img src="webmap_final/images/schwarzer_baer.jpg" alt="Schwarzer Bär in Göttingen" loading="lazy" width="95" height="85"></div><span class="thumbnail-credit"><a href="https://commons.wikimedia.org/wiki/File:Zum_schwarzen_B%C3%A4ren_%28G%C3%B6ttingen%29_jm20489.jpg" target="_blank" rel="noopener noreferrer">© Joergens.mi</a> · <a href="https://creativecommons.org/licenses/by-sa/3.0/de/" target="_blank" rel="noopener noreferrer">CC BY-SA 3.0</a></span></div>
             <div class="card-details">
               <h3>Schwarzer Bär</h3>
               <span class="location">Göttingen, Niedersachsen</span>
@@ -478,7 +481,7 @@
 
     <!-- شباك الخريطة -->
     <main class="map-container">
-      <iframe id="map-frame" title="Interaktive Karte der zwölf Denkmalfälle" src="webmap_final/index.html#6/51.288/10.568"></iframe>
+      <iframe id="map-frame" title="Interaktive Karte der zwölf Denkmalfälle" src="webmap_final/index.html"></iframe>
     </main>
 
   </div>
@@ -494,7 +497,7 @@
         <a href="https://de.wikipedia.org" target="_blank">Wikipedia</a>
       </span>
       <span>|</span>
-      <span><strong>Autorin:</strong> Sarah</span>
+      <span><strong>Autorin:</strong> Sarah Elhanbay</span>
       <span>·</span>
       <span><strong>Stand:</strong> Oktober 2026</span>
     </div>
