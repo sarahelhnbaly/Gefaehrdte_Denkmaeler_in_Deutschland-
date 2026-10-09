@@ -1,13 +1,13 @@
 # 🏛️ Gefährdete Denkmale in Deutschland (Endangered Heritage Sites)
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23245212.svg)](https://doi.org/10.5281/zenodo.23245212)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23244912.svg)](https://doi.org/10.5281/zenodo.23244912)
 [![Version](https://img.shields.io/badge/version-v1.1.0-blue.svg)](https://github.com/sarahelhnbaly/Gefaehrdte_Denkmaeler_in_Deutschland-)
-[![Release Date](https://img.shields.io/badge/release-Oct%208%2C%202026-green.svg)](https://doi.org/10.5281/zenodo.23245212)
+[![Release Date](https://img.shields.io/badge/release-Oct%208%2C%202026-green.svg)](https://doi.org/10.5281/zenodo.23244912)
 
 An interactive Web-GIS application designed to visualize and monitor endangered cultural heritage monuments across Germany. This project bridges digital archaeology and modern web mapping techniques, transforming spatial heritage data into an engaging and accessible public interface.
 
 🔗 **[Live Demo](https://sarahelhnbaly.github.io/Gefaehrdte_Denkmaeler_in_Deutschland-/)**  
-📦 **DOI (Zenodo Archive):** [10.5281/zenodo.23245212](https://doi.org/10.5281/zenodo.23245212)
+📦 **DOI (Zenodo Archive):** [10.5281/zenodo.23244912](https://doi.org/10.5281/zenodo.23244912)
 
 ---
 
